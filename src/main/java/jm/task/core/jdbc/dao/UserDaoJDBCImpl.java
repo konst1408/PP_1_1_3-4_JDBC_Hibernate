@@ -9,9 +9,6 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private static final Connection connection = Util.getConnection();
-    private static final String INSERT = "INSERT INTO `user`.`users` (id,name,lastName,age) VALUES(id,?,?,?)";
-    private static final String DELETE = "DELETE FROM users WHERE id=?";
-    private static final String GET_ALL = "SELECT * FROM users";
     List<User> us = new ArrayList<>();
 
     public UserDaoJDBCImpl() {
@@ -41,7 +38,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `user`.`users` (id,name,lastName,age) VALUES(id,?,?,?)")) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
@@ -54,7 +51,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(DELETE)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users WHERE id=?")) {
             preparedStatement.setInt(1, (int) id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -66,7 +63,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
 
         try (Statement statement = connection.createStatement()) {
-            ResultSet res = statement.executeQuery(GET_ALL);
+            ResultSet res = statement.executeQuery("SELECT * FROM users");
             while (res.next()) {
                 User user = new User();
                 user.setId(res.getLong("id"));
